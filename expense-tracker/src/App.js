@@ -1,30 +1,30 @@
 import React from 'react';
-import './App.css';
-import { 
-    BrowserRouter as Router, 
-    Routes, 
-    Route, 
-    Navigate 
+import {
+    Navigate,
+    Route,
+    BrowserRouter as Router,
+    Routes
 } from 'react-router-dom';
+import './App.css';
 import SpendingVisualization from './components/spendingVisualization';
 
 // Authentication
 import AuthForm from './components/AuthForm';
 
 // Protected Components
+import CategoryManagement from './components/CategoryManagement';
 import Dashboard from './components/Dashboard';
-import ExpenseList from './components/expenseList';
 import ExpenseForm from './components/expenseForm';
-import CategoryManagement from './components/categoryManagement';
+import ExpenseList from './components/expenseList';
 import Navigation from './components/Navigation';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-    //const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     
-    //if (!token) {
-      //  return <Navigate to="/login" replace />;
-   // }
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
 
     return (
         <>
@@ -86,7 +86,16 @@ function App() {
                         } 
                     />
 
-                    {/* Default Route - Redirect to Login or Dashboard */}
+                    <Route 
+                        path="/categories/manage" 
+                        element={
+                            <ProtectedRoute>
+                                <CategoryManagement />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* Default Route - Redirect to Login */}
                     <Route 
                         path="/" 
                         element={<Navigate to="/login" replace />} 

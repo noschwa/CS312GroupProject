@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import './CategoryManagement.css'; // Import the CSS file for styling
 
 const CategoryManagement = () => {
     const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
-    const [error, setError] = useState(null);
+    const [newCategoryName, setNewCategoryName] = useState("");
+    const [editingCategory, setEditingCategory] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [errors, setErrors] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
-    // Fetch categories
+    // Fetch categories from the API
     const fetchCategories = async () => {
         try {
             // const token = localStorage.getItem('token');
@@ -18,24 +21,21 @@ const CategoryManagement = () => {
                     'Content-Type': 'application/json'
                 }
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
-
-            const data = await response.json();
-            setCategories(data);
+            setCategories(response.data);
             setLoading(false);
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+            setErrors("Failed to fetch categories.");
             setLoading(false);
         }
     };
 
-    // Add new category
-    const handleAddCategory = async (e) => {
-        e.preventDefault();
-        setError(null);
+    // Add a new category
+    const addCategory = async () => {
+        if (!newCategoryName.trim()) {
+            setErrors("Category name cannot be empty.");
+            return;
+        }
 
         try {
             // const token = localStorage.getItem('token');
@@ -72,31 +72,67 @@ const CategoryManagement = () => {
     return (
         <div className="category-management">
             <h1>Category Management</h1>
-            {loading && <p>Loading...</p>}
-            {error && <p className="error">{error}</p>}
+
+            {/* Success and Error Messages */}
+            {errors && <div className="error">{errors}</div>}
+            {successMessage && <div className="success">{successMessage}</div>}
+
+            {/* Add New Category */}
+            <div className="add-category">
+                <input
+                    type="text"
+                    placeholder="New Category Name"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                />
+                <button onClick={addCategory}>Add Category</button>
+            </div>
+
+            {/* Category List */}
             <table className="category-table">
                 <thead>
                     <tr>
                         <th>Category</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {categories.map((category) => (
                         <tr key={category.category_id}>
-                            <td>{category.name}</td>
+                            <td>
+                                {editingCategory === category.category_id ? (
+                                    <input
+                                        type="text"
+                                        defaultValue={category.name}
+                                        onBlur={(e) =>
+                                            editCategory(category.category_id, e.target.value)
+                                        }
+                                        autoFocus
+                                    />
+                                ) : (
+                                    category.name
+                                )}
+                            </td>
+                            <td>
+                                {editingCategory !== category.category_id && (
+                                    <>
+                                        <button
+                                            onClick={() => setEditingCategory(category.category_id)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => deleteCategory(category.category_id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <div className="add-category">
-                <input
-                    type="text"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    placeholder="New Category"
-                />
-                <button onClick={handleAddCategory}>Add Category</button>
-            </div>
         </div>
     );
 };

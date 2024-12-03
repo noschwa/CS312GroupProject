@@ -49,3 +49,171 @@ code {
     transform: rotate(360deg);
   }
 }
+
+/* Error message styling */
+.error {
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
+  border: 1px solid #ff4d4d;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+/* Success message styling */
+.success {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid #4caf50;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+/* Form container styling */
+.expense-form-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Input fields and textarea styling */
+.expense-form input,
+.expense-form select,
+.expense-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1em;
+}
+
+/* Input and textarea focus state */
+.expense-form input:focus,
+.expense-form select:focus,
+.expense-form textarea:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 5px rgba(97, 218, 251, 0.7);
+}
+
+/* Button styling */
+.submit-btn {
+  background-color: #61dafb;
+  color: #282c34;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #21a1f1;
+  color: white;
+}
+
+.submit-btn:disabled {
+  background-color: rgba(97, 218, 251, 0.5);
+  color: rgba(40, 44, 52, 0.5);
+  cursor: not-allowed;
+}
+
+/* Label styling */
+.expense-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Loading message styling */
+.loading {
+  color: #61dafb;
+  text-align: center;
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+/* Category list styling */
+.category-management ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.category-management li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.category-management li span {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+/* Category list buttons */
+.category-management li button {
+  background-color: #61dafb;
+  color: #282c34;
+  border: none;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-management li button:hover {
+  background-color: #21a1f1;
+  color: white;
+}
+
+/* Add/Edit category styling */
+.add-category,
+.edit-category {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.add-category input,
+.edit-category input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+/* Responsive styling for small screens */
+@media (max-width: 600px) {
+  .expense-form-container {
+    padding: 15px;
+  }
+
+  .expense-form input,
+  .expense-form select,
+  .expense-form textarea {
+    font-size: 0.9em;
+  }
+
+  .submit-btn {
+    font-size: 0.9em;
+    padding: 8px 10px;
+  }
+}

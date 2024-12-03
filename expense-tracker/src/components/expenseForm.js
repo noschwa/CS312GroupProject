@@ -1,114 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ExpenseForm = ({ onSubmit, initialExpense = null }) => {
     const [formData, setFormData] = useState({
-        categoryId: '',
-        amount: '',
-        description: '',
-        expenseDate: ''
+        categoryId: "",
+        amount: "",
+        description: "",
+        expenseDate: "",
     });
     const [categories, setCategories] = useState([]);
+    const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState("");
     const [error, setError] = useState(null);
 
-    // Fetch categories when component mounts
+    // Fetch categories and populate form data if editing an expense
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/categories', {
-                    method: 'GET',
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                const token = localStorage.getItem("token");
+                const response = await axios.get("/api/categories", {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch categories');
-                }
-
-                const data = await response.json();
-                setCategories(data);
+                setCategories(response.data);
             } catch (err) {
-                setError(err.message);
+                setError("Failed to fetch categories.");
             }
         };
 
-        // Populate form if editing existing expense
         if (initialExpense) {
             setFormData({
-                categoryId: initialExpense.category_id,
-                amount: initialExpense.amount.toString(),
-                description: initialExpense.description || '',
-                expenseDate: initialExpense.expense_date.split('T')[0]
+                categoryId: initialExpense.category_id || "",
+                amount: initialExpense.amount?.toString() || "",
+                description: initialExpense.description || "",
+                expenseDate: initialExpense.expense_date
+                    ? initialExpense.expense_date.split("T")[0]
+                    : "",
             });
         }
 
         fetchCategories();
     }, [initialExpense]);
 
-    // Handle input changes
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.amount || isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
+            newErrors.amount = "Please enter a valid amount.";
+        }
+        if (!formData.expenseDate) {
+            newErrors.expenseDate = "Please select a date.";
+        }
+        if (!formData.description) {
+            newErrors.description = "Description is required.";
+        }
+        if (!formData.categoryId) {
+            newErrors.categoryId = "Please select a category.";
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrors({});
         setError(null);
 
-        try {
-            const token = localStorage.getItem('token');
-            const endpoint = initialExpense 
-                ? `/api/expenses/${initialExpense.expense_id}` 
-                : '/api/expenses';
-            
-            const method = initialExpense ? 'PUT' : 'POST';
+        if (!validateForm()) return;
 
-            const response = await fetch(endpoint, {
+        try {
+            const token = localStorage.getItem("token");
+            const endpoint = initialExpense
+                ? `/api/expenses/${initialExpense.expense_id}`
+                : "/api/expenses";
+            const method = initialExpense ? "PUT" : "POST";
+
+            const response = await axios({
                 method,
+                url: endpoint,
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
+                data: {
                     ...formData,
-                    amount: parseFloat(formData.amount)
-                })
+                    amount: parseFloat(formData.amount),
+                },
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to save expense');
+            const savedExpense = response.data;
+
+            if (onSubmit) {
+                onSubmit(savedExpense);
             }
 
-            const savedExpense = await response.json();
-            
-            // Call parent component's onSubmit
-            onSubmit(savedExpense);
-
-            // Reset form
             setFormData({
-                categoryId: '',
-                amount: '',
-                description: '',
-                expenseDate: ''
+                categoryId: "",
+                amount: "",
+                description: "",
+                expenseDate: "",
             });
+            setSuccessMessage("Expense saved successfully!");
+            setTimeout(() => setSuccessMessage(""), 3000);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.error || "Failed to save expense.");
         }
     };
 
     return (
         <div className="expense-form-container">
             <form onSubmit={handleSubmit} className="expense-form">
-                <h2>{initialExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
+                <h2>{initialExpense ? "Edit Expense" : "Add New Expense"}</h2>
 
                 {error && <div className="error-message">{error}</div>}
+                {successMessage && <div className="success-message">{successMessage}</div>}
 
                 <div className="form-group">
                     <label htmlFor="categoryId">Category</label>
@@ -120,15 +131,13 @@ const ExpenseForm = ({ onSubmit, initialExpense = null }) => {
                         required
                     >
                         <option value="">Select Category</option>
-                        {categories.map(category => (
-                            <option 
-                                key={category.category_id} 
-                                value={category.category_id}
-                            >
+                        {categories.map((category) => (
+                            <option key={category.category_id} value={category.category_id}>
                                 {category.name}
                             </option>
                         ))}
                     </select>
+                    {errors.categoryId && <p className="error">{errors.categoryId}</p>}
                 </div>
 
                 <div className="form-group">
@@ -141,8 +150,10 @@ const ExpenseForm = ({ onSubmit, initialExpense = null }) => {
                         onChange={handleChange}
                         min="0.01"
                         step="0.01"
+                        placeholder="Enter amount"
                         required
                     />
+                    {errors.amount && <p className="error">{errors.amount}</p>}
                 </div>
 
                 <div className="form-group">
@@ -153,7 +164,9 @@ const ExpenseForm = ({ onSubmit, initialExpense = null }) => {
                         value={formData.description}
                         onChange={handleChange}
                         rows="3"
+                        placeholder="Enter description"
                     />
+                    {errors.description && <p className="error">{errors.description}</p>}
                 </div>
 
                 <div className="form-group">
@@ -166,14 +179,9 @@ const ExpenseForm = ({ onSubmit, initialExpense = null }) => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.expenseDate && <p className="error">{errors.expenseDate}</p>}
                 </div>
 
                 <button type="submit" className="submit-btn">
-                    {initialExpense ? 'Update Expense' : 'Add Expense'}
-                </button>
-            </form>
-        </div>
-    );
-};
-
-export default ExpenseForm;
+                    {initialExpense ? "Update Expense" : "Add Expense"}
+                </b
