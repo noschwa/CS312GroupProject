@@ -1,10 +1,12 @@
 import React from 'react';
+import './App.css';
 import { 
     BrowserRouter as Router, 
     Routes, 
     Route, 
     Navigate 
 } from 'react-router-dom';
+import SpendingVisualization from './components/spendingVisualization';
 
 // Authentication
 import AuthForm from './components/AuthForm';
@@ -18,11 +20,11 @@ import Navigation from './components/Navigation';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem('token');
+    //const token = localStorage.getItem('token');
     
-    if (!token) {
-        return <Navigate to="/login" replace />;
-    }
+    //if (!token) {
+      //  return <Navigate to="/login" replace />;
+   // }
 
     return (
         <>
@@ -36,6 +38,10 @@ function App() {
     return (
         <Router>
             <div className="App">
+                <header className="App-header">
+                    <h1>Financial Dashboard</h1>
+                </header>
+                <SpendingVisualization />
                 <Routes>
                     {/* Authentication Routes */}
                     <Route 

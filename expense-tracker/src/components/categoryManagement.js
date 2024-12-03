@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './CategoryManagement.css'; // Import the CSS file for styling
 
 const CategoryManagement = () => {
     const [categories, setCategories] = useState([]);
@@ -71,41 +72,31 @@ const CategoryManagement = () => {
 
     return (
         <div className="category-management">
-            <h2>Manage Categories</h2>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <form onSubmit={handleAddCategory} className="add-category-form">
+            <h1>Category Management</h1>
+            {loading && <p>Loading...</p>}
+            {error && <p className="error">{error}</p>}
+            <table className="category-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {categories.map((category) => (
+                        <tr key={category.category_id}>
+                            <td>{category.name}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <div className="add-category">
                 <input
                     type="text"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    placeholder="New Category Name"
-                    required
+                    placeholder="New Category"
                 />
-                <button type="submit">Add Category</button>
-            </form>
-
-            <div className="categories-list">
-                <h3>Your Categories</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category Name</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {categories.map((category) => (
-                            <tr key={category.category_id}>
-                                <td>{category.name}</td>
-                                <td>
-                                    {category.is_default ? 'Default' : 'Custom'}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <button onClick={handleAddCategory}>Add Category</button>
             </div>
         </div>
     );

@@ -21,34 +21,34 @@ const AuthForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
+        // setError(null);
 
-        try {
-            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+        // try {
+        //     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
             
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+        //     const response = await fetch(endpoint, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(formData)
+        //     });
 
-            const data = await response.json();
+        //     const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Authentication failed');
-            }
+        //     if (!response.ok) {
+        //         throw new Error(data.error || 'Authentication failed');
+        //     }
 
-            // Store token and user ID
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('userId', data.userId);
+        //     // Store token and user ID
+        //     localStorage.setItem('token', data.token);
+        //     localStorage.setItem('userId', data.userId);
 
-            // Redirect to dashboard
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.message);
-        }
+        //     // Redirect to dashboard
+             navigate('/dashboard');
+        // } catch (err) {
+        //     setError(err.message);
+        // }
     };
 
     const toggleAuthMode = () => {

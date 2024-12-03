@@ -1,67 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExpenseList from './expenseList';
+import SpendingVisualization from './spendingVisualization';
+import './Dashboard.css';
 
 const Dashboard = () => {
-    const [monthlySummary, setMonthlySummary] = useState(null);
+    const [monthlySummary, setMonthlySummary] = useState({ categories: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Fetch monthly summary
-    const fetchMonthlySummary = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const currentDate = new Date();
-            const response = await fetch(`/api/expenses/summary?month=${currentDate.getMonth() + 1}&year=${currentDate.getFullYear()}`, {
-                method: 'GET',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+    useEffect(() => {
+        const fetchMonthlySummary = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/monthly-summary', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch monthly summary');
                 }
-            });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch monthly summary');
+                const data = await response.json();
+                setMonthlySummary(data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
             }
+        };
 
-            const data = await response.json();
-            setMonthlySummary(data);
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
-    };
+        fetchMonthlySummary();
+    }, []);
 
-    // Handle logout
     const handleLogout = () => {
-        // Remove stored credentials
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
-        
-        // Redirect to login
         navigate('/login');
     };
 
-    // Fetch summary on component mount
-    useEffect(() => {
-        // Check if user is authenticated
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-
-        fetchMonthlySummary();
-    }, [navigate]);
-
-    // Render loading state
     if (loading) {
         return <div>Loading dashboard...</div>;
     }
 
-    // Render error state
     if (error) {
         return (
             <div>
@@ -108,6 +94,10 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                 </div>
+            </section>
+
+            <section className="spending-visualization-section">
+                <SpendingVisualization />
             </section>
 
             <section className="expense-list-section">

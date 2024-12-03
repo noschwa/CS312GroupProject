@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const router = express.Router();
+const app = express();
+require('dotenv').config();
 
 // PostgreSQL Connection Pool
 const pool = new Pool({
@@ -12,6 +14,9 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+
+// Middleware to parse JSON bodies
+app.use(express.json());
 
 // Authentication Middleware
 const authMiddleware = (req, res, next) => {
@@ -362,12 +367,28 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
-
-module.exports = router;
+// Route to fetch spending data
+router.get('/spending', authMiddleware, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM spending WHERE user_id = $1', [req.user.id]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Logout Route (client-side: remove token)
 router.post('/logout', authMiddleware, (req, res) => {
     res.json({ message: 'Logout successful' });
+});
+
+// Use the router
+app.use('/api/auth', router);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = { router, authMiddleware };

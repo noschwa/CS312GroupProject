@@ -19,32 +19,54 @@ const ExpenseList = () => {
     const fetchExpenses = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
+        //     const token = localStorage.getItem('token');
             
-            // Construct query parameters
-            const params = new URLSearchParams({
-                page: pagination.page,
-                limit: pagination.limit,
-                ...filters
-            });
+        //     // Construct query parameters
+        //     const params = new URLSearchParams({
+        //         page: pagination.page,
+        //         limit: pagination.limit,
+        //         ...filters
+        //     });
 
-            const response = await fetch(`/api/expenses?${params}`, {
-                method: 'GET',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        //     const response = await fetch(`/api/expenses?${params}`, {
+        //         method: 'GET',
+        //         headers: { 
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     });
+
+        //     if (!response.ok) {
+        //         throw new Error('Failed to fetch expenses');
+        //     }
+
+        //     const data = await response.json();
+
+        const mockData = {
+            expenses: [
+                {
+                    expense_id: 1,
+                    expense_date: new Date().toISOString(),
+                    category_name: 'Groceries',
+                    amount: 50.75,
+                    description: 'Weekly grocery shopping'
+                },
+                {
+                    expense_id: 2,
+                    expense_date: new Date().toISOString(),
+                    category_name: 'Dining Out',
+                    amount: 35.20,
+                    description: 'Lunch with friends'
                 }
-            });
+            ],
+            totalPages: 1,
+            page: 1
+        };
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch expenses');
-            }
-
-            const data = await response.json();
-            setExpenses(data.expenses);
+            setExpenses(mockData.expenses);
             setPagination(prev => ({
                 ...prev,
-                totalPages: data.totalPages
+                totalPages: mockData.totalPages
             }));
             setLoading(false);
         } catch (err) {
