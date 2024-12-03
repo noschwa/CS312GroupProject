@@ -6,9 +6,9 @@ body {
   background: linear-gradient(135deg, #282c34, #3a3f47);
   color: white;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
 }
 
 code {

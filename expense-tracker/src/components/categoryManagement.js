@@ -10,11 +10,11 @@ const CategoryManagement = () => {
     // Fetch categories
     const fetchCategories = async () => {
         try {
-            const token = localStorage.getItem('token');
+            // const token = localStorage.getItem('token');
             const response = await fetch('/api/categories', {
                 method: 'GET',
                 headers: { 
-                    'Authorization': `Bearer ${token}`,
+                    // 'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -38,11 +38,11 @@ const CategoryManagement = () => {
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
+            // const token = localStorage.getItem('token');
             const response = await fetch('/api/categories', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // 'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ name: newCategory })
@@ -61,7 +61,6 @@ const CategoryManagement = () => {
         }
     };
 
-    // Fetch categories on component mount
     useEffect(() => {
         fetchCategories();
     }, []);
