@@ -2,7 +2,6 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
-const router = express.Router();
 const app = express();
 require('dotenv').config();
 
@@ -34,6 +33,9 @@ const authMiddleware = (req, res, next) => {
         res.status(401).json({ error: 'Invalid or expired token' });
     }
 };
+
+// Define the router
+const router = express.Router();
 
 // Registration Route
 router.post('/register', async (req, res) => {
@@ -131,7 +133,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Create Expense
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/expenses', authMiddleware, async (req, res) => {
     const { categoryId, amount, description, expenseDate } = req.body;
     const userId = req.user.userId;
 
@@ -152,7 +154,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Read Expenses (with pagination and filtering)
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/expenses', authMiddleware, async (req, res) => {
     const userId = req.user.userId;
     const { 
         page = 1, 
@@ -228,7 +230,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Update Expense
-router.put('/:expenseId', authMiddleware, async (req, res) => {
+router.put('/expenses/:expenseId', authMiddleware, async (req, res) => {
     const { expenseId } = req.params;
     const userId = req.user.userId;
     const { categoryId, amount, description, expenseDate } = req.body;
@@ -257,7 +259,7 @@ router.put('/:expenseId', authMiddleware, async (req, res) => {
 });
 
 // Delete Expense
-router.delete('/:expenseId', authMiddleware, async (req, res) => {
+router.delete('/expenses/:expenseId', authMiddleware, async (req, res) => {
     const { expenseId } = req.params;
     const userId = req.user.userId;
 
@@ -279,7 +281,7 @@ router.delete('/:expenseId', authMiddleware, async (req, res) => {
 });
 
 // Monthly Summary
-router.get('/summary', authMiddleware, async (req, res) => {
+router.get('/expenses/summary', authMiddleware, async (req, res) => {
     const userId = req.user.userId;
     const { month, year } = req.query;
 
@@ -318,7 +320,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
 });
 
 // Get Categories (User's custom + default)
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/categories', authMiddleware, async (req, res) => {
     const userId = req.user.userId;
 
     try {
@@ -339,7 +341,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Create Custom Category
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/categories', authMiddleware, async (req, res) => {
     const userId = req.user.userId;
     const { name } = req.body;
 
